@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         widthAnimator = new ValueAnimator();
         positionAnimator = new ValueAnimator();
-
+        animatorSet = new AnimatorSet();
 
         parentLayout = findViewById(R.id.parentLayout);
 
@@ -62,81 +62,132 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        animatorSet = new AnimatorSet();
+
         if (!animatorSet.isRunning()) {
 
             if (!isExpanded) {
+                widthAnimator = new ValueAnimator();
+                positionAnimator = new ValueAnimator();
 
                 widthAnimator.setIntValues(v.getWidth(), parentLayout.getWidth());
-                widthAnimator.setDuration(1000);
-
-                positionAnimator.setIntValues(left,right);
-                positionAnimator.setDuration(1000);
-
+                widthAnimator.setDuration(400);
                 widthAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator animation) {
-                        int width = (int) widthAnimator.getAnimatedValue();
-                        btnExpand.setWidth(width);
+                        int wi = (int) animation.getAnimatedValue();
+                        btnExpand.setWidth(wi);
+                        if (wi >= parentLayout.getWidth()){
+                            RelativeLayout.LayoutParams layoutParamsView = new RelativeLayout.LayoutParams(
+                                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                            layoutParamsView.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+                            btnExpand.setLayoutParams(layoutParamsView);
+                        }
+
                     }
                 });
 
+                positionAnimator.setIntValues(parentLayout.getWidth(),btnWidth);
+                positionAnimator.setDuration(400);
                 positionAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator animation) {
-                        Integer x = (Integer) animation.getAnimatedValue();
-                        btnExpand.setX(x);
+                        int wi = (int) animation.getAnimatedValue();
+                        btnExpand.setWidth(wi);
                     }
                 });
 
-                widthAnimator.addListener(new AnimatorListenerAdapter() {
+
+                animatorSet.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        btnExpand.setText("CLICK TO SHRINK!");
                         isExpanded = true;
+                        animatorSet.removeListener(this);
+                        widthAnimator.removeAllUpdateListeners();
+                        positionAnimator.removeAllUpdateListeners();
+                        animatorSet = new AnimatorSet();
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
                     }
                 });
 
-
-                animatorSet.playTogether(widthAnimator,positionAnimator);
+                animatorSet.playSequentially(widthAnimator,positionAnimator);
                 animatorSet.start();
-
             }else {
 
-
-                widthAnimator.setIntValues(parentLayout.getWidth(),btnWidth);
-                widthAnimator.setDuration(1000);
-
-                positionAnimator.setIntValues(right,left);
-                positionAnimator.setDuration(1000);
-
+                widthAnimator = new ValueAnimator();
+                positionAnimator = new ValueAnimator();
+                widthAnimator.setIntValues(btnWidth, parentLayout.getWidth());
+                widthAnimator.setDuration(400);
                 widthAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator animation) {
-                        int width = (int) animation.getAnimatedValue();
-                        btnExpand.setWidth(width);
+                        int wi = (int) animation.getAnimatedValue();
+                        btnExpand.setWidth(wi);
+                        if (wi >= parentLayout.getWidth()){
+                            RelativeLayout.LayoutParams layoutParamsView = new RelativeLayout.LayoutParams(
+                                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT);
 
+                            layoutParamsView.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+                            btnExpand.setLayoutParams(layoutParamsView);
+
+                        }
+                       Log.i("Size","Size: " + wi);
 
                     }
                 });
 
+                positionAnimator.setIntValues(parentLayout.getWidth(),btnWidth);
+                positionAnimator.setDuration(400);
                 positionAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator animation) {
-                        Integer x = (Integer) animation.getAnimatedValue();
-                        btnExpand.setX(x);
+                        int wi = (int) animation.getAnimatedValue();
+                        btnExpand.setWidth(wi);
                     }
                 });
 
-                widthAnimator.addListener(new AnimatorListenerAdapter() {
+                animatorSet.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         isExpanded = false;
-                        btnExpand.setText("Click To Expand!");
+                        animatorSet.removeListener(this);
+                        widthAnimator.removeAllUpdateListeners();
+                        positionAnimator.removeAllUpdateListeners();
+                        animatorSet = new AnimatorSet();
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
                     }
                 });
-
-                animatorSet.playTogether(widthAnimator,positionAnimator);
+                animatorSet.playSequentially(widthAnimator,positionAnimator);
                 animatorSet.start();
             }
 
